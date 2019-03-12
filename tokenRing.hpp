@@ -11,6 +11,10 @@ pthread_t working_thread;
 int sockfd_out = 0;
 int sockfd_in = 0;
 struct token;
+int epoll_fd;
+int multi_fd = 0;
+int multi_port = 12345;
+char multi_adr[] = "230.230.230.230";
 std::queue <token> token_queue;
 
 struct options{
@@ -22,7 +26,7 @@ struct options{
 }client_options;
 
 enum token_type{
-    DATA
+    DATA=0, REBUILD=1, REBUILD_2=2, EMPTY=3, WRONG=4
 };
 
 
@@ -31,6 +35,13 @@ struct token{
     char dest[128];
     char source[128];
     char data[1024];
+};
+
+struct rebuild_options{
+    int old_port;
+    int new_port;
+    char old_ip[16];
+    char new_ip[16];
 };
 
 void error(const char *msg);
