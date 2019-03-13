@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
     while(true) {
         if (epoll_wait(epoll_fd, &ev, 1, -1) == -1)
             error("Epoll waiting error\n");
-        if (ev.data.fd < 0)
+        if (ev.data.fd == sockfd_in)
             connect_client();
         else handle_token(ev.data.fd);
     }
@@ -110,14 +110,10 @@ void create_server(){
         error("ERROR on binding");
 
     listen(sockfd_in,5);
-    // cout<<"Listening\n";
-
 }
 
 void create_client() {
-
     if(sockfd_out != 0){
-        //cout <<"shuting down old one\n";
         if (shutdown(sockfd_out, SHUT_RDWR) == -1) error("Error while shuting down a socket\n");
         if (close(sockfd_out) == -1) error("Error while closing socket\n");
         sockfd_out = 0;
@@ -126,14 +122,12 @@ void create_client() {
     sockfd_out = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd_out < 0)
         error("ERROR opening socket");
-
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(client_options.port);
     serv_addr.sin_addr.s_addr = inet_addr(client_options.ip);
     if (connect(sockfd_out, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
         error("ERROR connecting");
-    //cout <<"connected\n";
 }
 
 
@@ -144,17 +138,13 @@ void init_epoll(){
 
     struct epoll_event event;
     event.events = EPOLLIN ;
-    event.data.fd = -1;
+    event.data.fd = sockfd_in;
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sockfd_in, &event) == -1)//add descriptor to epoll_fd
         error("Failed to add socket to epoll\n");
 
 }
 
 void rebuild_token_ring(){
-
-
-    struct sockaddr_in my_addr;
-    int len = sizeof(my_addr);
     rebuild_options rebuild_options;
 
     bzero(&rebuild_options, sizeof(rebuild_options));
@@ -162,7 +152,10 @@ void rebuild_token_ring(){
     rebuild_options.new_port = client_options.local_port;
     strcpy(rebuild_options.old_ip, client_options.ip);
 
-    /*bzero(&my_addr, sizeof(my_addr));
+    /*
+    struct sockaddr_in my_addr;
+    int len = sizeof(my_addr);
+    bzero(&my_addr, sizeof(my_addr));
     getsockname(sockfd_in, (struct sockaddr *) &my_addr,(socklen_t*) &len);
     inet_ntop(AF_INET, &my_addr.sin_addr, myIP, sizeof(myIP));
     strcpy(rebuild_options.new_ip, myIP);
@@ -173,8 +166,6 @@ void rebuild_token_ring(){
     memcpy(token.data, &rebuild_options, sizeof(rebuild_options));
     strcpy(token.source, client_options.id);
     strcpy(token.dest, client_options.id);
-
-    //cout << "Send rebuild\n";
     send_token(token);
 
 }
@@ -182,7 +173,6 @@ void rebuild_token_ring(){
 void handle_token(int fd){
     struct sockaddr_in addr;
     token token = receive_token(fd, &addr);
-    cout << client_options.id;
     send_multicast(client_options.id, sizeof(client_options.id));
     sleep(1);
     switch (token.type){
@@ -204,10 +194,8 @@ void handle_token(int fd){
 }
 
 void handle_rebuild(token token, sockaddr_in addr){
-    //cout<<"handle rebuild\n";
     rebuild_options *rebuild_options = (struct rebuild_options*) token.data;
     strcpy(rebuild_options->new_ip, inet_ntoa(addr.sin_addr));
-   // cout << rebuild_options->new_ip;
     if (!reconnect(token)){
         token.type = REBUILD_2;
         send_token(token);
@@ -219,7 +207,6 @@ int reconnect(token token){
     rebuild_options *rebuild_options = (struct rebuild_options*) token.data;
     if (!strcmp(rebuild_options->old_ip, client_options.ip) &&
         client_options.port == rebuild_options->old_port) {
-        //cout << "handle full rebuild\n";
         client_options.port = rebuild_options->new_port;
         strcpy(client_options.ip, rebuild_options->new_ip);
         create_client();
@@ -229,13 +216,12 @@ int reconnect(token token){
 }
 
 void handle_data(token token){
-    //cout <<"receive data\n";
     if (strcmp(token.dest, client_options.id) == 0){
-        cout << "Received data from " << token.source << ": \n"<< token.data << "\n";
+        cout << "Received data from " << token.source << ": "<< token.data << "\n";
         handle_empty();
     }
     else if(strcmp(token.source, client_options.id) == 0){
-        cout << "Message wasn't delieverd\n";
+        cout << "Message wasn't delievered\n";
         handle_empty();
     }
      else {
@@ -246,13 +232,11 @@ void handle_data(token token){
 
 void handle_empty(){
     if (token_queue.empty()) {
-        //cout << "Send empty\n";
         send_token(empty_token());
     }
     else {
         token token = token_queue.front();
         token_queue.pop();
-        //cout << "send massage\n";
         send_token(token);
     }
 }
@@ -262,7 +246,6 @@ void handle_rebuild_with_adr(token token){
 }
 
 void send_token(token token){
-    //cout << "Sending token" << token.type << "\n";
     if (write(sockfd_out, &token, sizeof(token))!= sizeof(token)){
         error("Error while sending a token\n");
     }
@@ -280,7 +263,6 @@ token receive_token(int fd, sockaddr_in *addr){
 }
 
 void disconnect_client(int fd){
-    // cout<<"Discon\n";
     if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL) == -1)
         error("Error while deleting socket from epoll\n");
 
@@ -302,8 +284,6 @@ void connect_client(){
     event.data.fd = newsockfd;
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, newsockfd, &event) == -1)//add descriptor to epoll_fd
         error("Failed to add socket to epoll\n");
-    //cout << "Accepted\n";
-
 }
 
 void close_sockets()

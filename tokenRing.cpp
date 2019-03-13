@@ -62,7 +62,6 @@ void init_multicast(){
 }
 
 void send_multicast(char* id, int len){
-    cout<<"send milrt\n";
     sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(multi_port);

@@ -26,7 +26,7 @@ struct options{
 }client_options;
 
 enum token_type{
-    DATA=0, REBUILD=1, REBUILD_2=2, EMPTY=3, WRONG=4
+    DATA, REBUILD, REBUILD_2, EMPTY, WRONG
 };
 
 
