@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="jgroups-3.6.13.Final">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/VirtualSynchronyLab/lib/jgroups-3.6.13.Final.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/VirtualSynchronyLab/lib/protobuf-java-2.6.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
