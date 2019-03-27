@@ -21,7 +21,7 @@ public class Receiver extends ReceiverAdapter {
 
     public void getState(OutputStream output) throws Exception {
         synchronized(state) {
-            Util.objectToStream(state, new DataOutputStream(output));
+            Util.objectToStream(state.getLocalHashMap(), new DataOutputStream(output));
         }
     }
 
@@ -34,7 +34,7 @@ public class Receiver extends ReceiverAdapter {
     }
 
     public void receive(Message msg) {
-        System.out.println(msg.getSrc() + ": " + msg.getObject());
+        //System.out.println(msg.getSrc() + ": " + msg.getObject());
         HashMapMessage hashMapMessage = (HashMapMessage) msg.getObject();
         switch (hashMapMessage.getType()){
             case PUT:

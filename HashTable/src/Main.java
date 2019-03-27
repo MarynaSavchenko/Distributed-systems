@@ -6,12 +6,12 @@ public class Main {
         System.setProperty("java.net.preferIPv4Stack","true");
         DistributedMap distributedMap = new DistributedMap("HashMapCluster");
         Scanner scanner = new Scanner(System.in);
-        String mess;
+        String message;
         while(true){
             System.out.println("Write: ");
-            mess = scanner.nextLine();
-            if (mess.equals("q")) break;
-            System.out.println(readMessage(mess, distributedMap));
+            message = scanner.nextLine();
+            if (message.equals("q")) break;
+            readMessage(message, distributedMap);
         }
     }
 

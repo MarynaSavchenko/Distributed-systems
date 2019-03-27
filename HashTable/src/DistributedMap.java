@@ -1,5 +1,4 @@
 import pl.edu.agh.dsrg.sr.protos.HashMapMessageProtos.HashMapMessage;
-
 import java.util.HashMap;
 
 public class DistributedMap implements SimpleStringMap {
@@ -18,11 +17,13 @@ public class DistributedMap implements SimpleStringMap {
     }
     @Override
     public boolean containsKey(String key) {
+        System.out.printf("CONTAINS KEY: %s %b \n", key, local_hash_map.containsKey(key));
         return local_hash_map.containsKey(key);
     }
 
     @Override
     public Integer get(String key) {
+        System.out.printf("GETTED key: %s value: %d \n", key, local_hash_map.get(key));
         return local_hash_map.get(key);
     }
 
@@ -36,9 +37,9 @@ public class DistributedMap implements SimpleStringMap {
             .build();
             channel.send(hashMapMessage);
         } catch (Exception e) {
-            //e.printStackTrace();
             System.out.println("Error while putting pair to map");
         }
+        System.out.printf("PUTTED key: %s, value: %d\n", key, value);
         return local_hash_map.put(key, value);
     }
 
@@ -51,9 +52,9 @@ public class DistributedMap implements SimpleStringMap {
                     .build();
             channel.send(hashMapMessage);
         } catch (Exception e) {
-            //e.printStackTrace();
             System.out.println("Error while removing key");
         }
+        System.out.printf("REMOVED key: %s \n", key);
         return local_hash_map.remove(key);
     }
 
