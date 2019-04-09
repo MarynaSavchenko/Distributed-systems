@@ -1,0 +1,13 @@
+Message from technician:  NAME: jack ,BODY PART: knee done
+
+Message from technician:  NAME: jack ,BODY PART: knee done
+
+Message from doctor: NAME: maska ,BODY PART: knee
+Message from technician:  NAME: maska ,BODY PART: knee done
+
+Message from doctor: NAME: masha ,BODY PART: hip
+Message from doctor: NAME: solo ,BODY PART: hip
+Message from technician:  NAME: masha ,BODY PART: hip done
+
+Message from technician:  NAME: solo ,BODY PART: hip done
+
