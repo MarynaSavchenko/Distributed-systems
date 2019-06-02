@@ -1,0 +1,30 @@
+
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.helloworld";
+option java_outer_classname = "HelloWorldProto";
+option objc_class_prefix = "HLW";
+
+package helloworld;
+
+enum Currency{
+    EUR = 0;
+    USD = 1;
+    PLN = 2;
+}
+
+
+service CurrencyExchange {
+  rpc getRate (RateRequest) returns (stream Rate) {}
+}
+
+message RateRequest {
+    Currency currencyFrom = 1;
+    Currency currencyTo = 2;
+}
+
+message Rate{
+    double value = 1;
+}
